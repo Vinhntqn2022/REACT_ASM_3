@@ -1,0 +1,25 @@
+.App {
+  text-align: center;
+}
+.search {
+  width: 20%;
+}
+
+.result {
+  width: 30%;
+  border: 1px solid rgba(148, 147, 147, 0.5);
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  background: rgba(148, 147, 147, 0.2);
+  &__title{
+    border-bottom: 1px solid aquamarine;
+    text-align: center;
+    background-color: grey;
+    &--image {
+      background-color: rgba(126, 216, 216, 0.3);
+    }
+  }
+  &__infor {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 0.5rem;
+  }
+}

@@ -1,72 +1,55 @@
 import axios from 'axios';
-import React, { useState, useEffect, Component } from 'react';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import './App.scss';
 import FormInput from './components/formInput';
 import UserDetailInfo from './components/userDetailInfo';
+import { useDebounce } from 'use-lodash-debounce'
 
-class App extends Component {
-  constructor(props){
-    super(props)
-    this.state = {
-      detailInfo: null,
-      url: 'https://api.github.com/users/ma'
-    }
-  }
-  handleDetailInfoGet = (inputData) => {
-        this.setState({url: `https://api.github.com/users/${inputData}`});
-      }
+
+function App() {
+  const [detailInfo, setDetailInfo] = useState(null)
+  const [inputData, setInputData] = useState("")
+  const [visible, setVisible] = useState(false)
   
-  componentDidMount() {
-    this.reloadedInterval = setInterval(() => {
-            axios.get(this.state.url)
-              .then(response => this.setState({detailInfo: response.data}))
-              .catch(err => console.log(err))
-            }, 5000)
+  const debouncedValue = useDebounce(inputData, 500)
+  
+  const getInputData = (e) => {
+    setInputData(e.target.value)
   }
-  componentWillUnmount() {
-     clearInterval(this.reloadedInterval)
+  const onGetData = (data) => {
+    axios.get(`https://api.github.com/users/${data}`)
+    .then(response => {
+      setDetailInfo(response.data);
+      setVisible(true)
+    })
+    .catch(err => {
+      setVisible(false)
+      console.log(err)
+    })
   }
-  render() { 
-    return (
-      <div className="App">
-        <div className='container'>
-          <div className="row search mx-auto">
-            <FormInput handleClick = {this.handleDetailInfoGet}/>
-            <UserDetailInfo usersInfor = {this.state.detailInfo}/>
-          </div>
+  useEffect(() => {
+    const reloadedInterval = setInterval(() => {
+      onGetData(inputData)
+    }, 5000)
+    return () => clearInterval(reloadedInterval) 
+    }, [debouncedValue]) 
+
+  return (
+    <div className="App">
+      <div className='container'>
+        <div className="row mx-auto">
+          <FormInput 
+          dataInput = {getInputData}
+          input = {inputData}  
+          />
+          <UserDetailInfo
+           usersInfor = {detailInfo}
+           userVisible = {visible}  
+           />
         </div>
+      </div>
     </div>
-    );
-  }
+  );
 }
- 
+
 export default App;
-// function App() {
-//   const [detailInfo, setDetailInfo] = useState(null)
-//   const [url, setUrl] = useState("https://api.github.com/users/ma")
-
-//   const handleDetailInfoGet = (inputData) => {
-//     setUrl(`https://api.github.com/users/${inputData}`);
-//   }
-
-//   useEffect(() => {
-//     const reloadedInterval = setInterval(() => {
-//           axios.get(url)
-//             .then(response => setDetailInfo(response.data))
-//             .catch(err => console.log(err))
-//           }, 5000)
-//       return () => clearInterval(reloadedInterval)
-//     }, [url]) 
-//   return (
-//     <div className="App">
-//       <div className='container'>
-//         <div className="row search mx-auto">
-//           <FormInput handleClick = {handleDetailInfoGet}/>
-//           <UserDetailInfo usersInfor = {detailInfo}/>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default App;
